@@ -58,7 +58,7 @@ const openModal = (image)=> {
       setIsLoading(true);
 
       const data = await fetchImagesWithSearch(searchTerm.split('/')[0], page);
-      console.log(data);
+     
      
       setGalleryImage((prevImages) =>[...prevImages, ...data]);
       }
