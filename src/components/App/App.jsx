@@ -1,14 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, CSSProperties  } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 
-import '../App/App.module.css'
+
+
+import css from './App.module.css'
 import SearchBar from '../SearchBar/SearchBar';
 import Loader from '../Loader/Loader'
 import ImageGallery from '../ImageGallery/ImageGallery';
 import LoadMoreBtn from '../LoadMoreBtn/LoadMoreBtn';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import ImageModal from '../ImageModal/ImageModal';
 
 import { fetchImagesWithSearch } from "../../articles-api";
+
 
 export default function App() {
   const [galleryImage, setGalleryImage] = useState([]);
@@ -17,7 +21,21 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
 
+
+  const [selectedImage, setSelectedImage] = useState(null);
+
+
+const openModal = (image)=> {
+  setSelectedImage(image);
   
+  }
+
+ const closeModal = ()=>  {
+   setSelectedImage(null);
+  
+  }
+
+
   const handleSearch = (image) => {
     setSearchTerm(`${image}/${Date.now()}`)
     setPage(1);
@@ -40,6 +58,7 @@ export default function App() {
       setIsLoading(true);
 
       const data = await fetchImagesWithSearch(searchTerm.split('/')[0], page);
+      console.log(data);
      
       setGalleryImage((prevImages) =>[...prevImages, ...data]);
       }
@@ -55,14 +74,15 @@ export default function App() {
 }, [page, searchTerm]);
   
   return (
-    <>
+    <div>
       <Toaster/>
       <SearchBar onSubmit={handleSearch} />
       {error && <ErrorMessage/>}
-      {galleryImage.length > 0 && <ImageGallery items={galleryImage} />}
+      {galleryImage.length > 0 && <ImageGallery items={galleryImage} onImageClick={openModal } />}
       {isLoading && <Loader />}
-      {galleryImage.length > 0 && !isLoading && <LoadMoreBtn onClick={handleLoadMoreClick } />}
-    </>
+      {galleryImage.length > 0 && !isLoading && <LoadMoreBtn onClick={handleLoadMoreClick} />}
+      <ImageModal  onRequestClose={closeModal} image={selectedImage} />
+    </div>
   )
 };
 
