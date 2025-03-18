@@ -24,6 +24,8 @@ export default function App() {
 
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const [hasMoreImages, setHasMoreImages] = useState(true);
+
 
 const openModal = (image)=> {
   setSelectedImage(image);
@@ -40,6 +42,7 @@ const openModal = (image)=> {
     setSearchTerm(`${image}/${Date.now()}`)
     setPage(1);
     setGalleryImage([]);
+    setHasMoreImages(true);
 
   };
   
@@ -60,7 +63,11 @@ const openModal = (image)=> {
       const data = await fetchImagesWithSearch(searchTerm.split('/')[0], page);
      
      
-      setGalleryImage((prevImages) =>[...prevImages, ...data]);
+      setGalleryImage((prevImages) => [...prevImages, ...data]);
+      
+       if (data.length < 6) {
+                    setHasMoreImages(false);
+                }
       }
        catch (error) {
       setError(true);
@@ -80,7 +87,7 @@ const openModal = (image)=> {
       {error && <ErrorMessage/>}
       {galleryImage.length > 0 && <ImageGallery items={galleryImage} onImageClick={openModal } />}
       {isLoading && <Loader />}
-      {galleryImage.length > 0 && !isLoading && <LoadMoreBtn onClick={handleLoadMoreClick} />}
+      {hasMoreImages && galleryImage.length > 0 && !isLoading && <LoadMoreBtn onClick={handleLoadMoreClick} />}
       <ImageModal  onRequestClose={closeModal} image={selectedImage} />
     </div>
   )
